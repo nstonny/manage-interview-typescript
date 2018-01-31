@@ -1,5 +1,5 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import Employee from '../model/employee';
+import Employee from '../models/employee';
 
 export class EmployeeRouter{
     router: Router;
@@ -28,9 +28,18 @@ export class EmployeeRouter{
         
    }
    public createEmployee(req:Request, res:Response): void{
-       const name: string = req.body.name;    
+       const firstName: String = req.body.firstName;
+       const lastName: String = req.body.lastName;  
+       const email: String = req.body.email; 
+       const department: String = req.body.department;
+       const position: String = req.body.position;
+
        const employee = new Employee({
-           name
+           firstName,
+           lastName,
+           email,
+           department,
+           position                    
        });       
        employee.save()
        .then(data => {

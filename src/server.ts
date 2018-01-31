@@ -5,7 +5,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 //import * as helmet from 'helmet';
 //import * as cors from 'cors';
-import EmployeeRouter from './route/employee'
+import EmployeeRouter from './routers/employeeRouter'
 
 //Server class
 class Server {
