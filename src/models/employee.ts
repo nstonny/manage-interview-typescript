@@ -11,8 +11,11 @@ export interface IEmployee extends IPerson, Document{
 }
 
 let EmployeeSchema: Schema = new Schema({
-    createdAt: Date,
-    updatedAt: Date,
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        required: true
+    },
     firstName:{
     type: String,
     trim: true,
@@ -45,6 +48,11 @@ let EmployeeSchema: Schema = new Schema({
         default: ''
     }
 });
-
+/* 
+// fix this for post request using findOneAndUpdate
+schema.pre('update', function() {
+    this.update({},{ $set: { updatedAt: new Date() } });
+  });
+  */
 export default model<IEmployee>('Employee', EmployeeSchema);
 

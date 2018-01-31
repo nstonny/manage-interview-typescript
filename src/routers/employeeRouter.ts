@@ -27,14 +27,14 @@ export class EmployeeRouter{
        });   
         
    }
-   public createEmployee(req:Request, res:Response): void{
+   public createEmployee(req:Request, res:Response): void{       
        const firstName: String = req.body.firstName;
        const lastName: String = req.body.lastName;  
        const email: String = req.body.email; 
        const department: String = req.body.department;
        const position: String = req.body.position;
 
-       const employee = new Employee({
+       const employee = new Employee({           
            firstName,
            lastName,
            email,
