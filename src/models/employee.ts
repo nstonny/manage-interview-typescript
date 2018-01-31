@@ -12,8 +12,8 @@ export interface IEmployee extends IPerson, Document{
 
 let EmployeeSchema: Schema = new Schema({
     createdAt: {
-        type: Date,
         default: Date.now,
+        type: Date,
         required: true
     },
     firstName:{
@@ -49,7 +49,7 @@ let EmployeeSchema: Schema = new Schema({
     }
 });
 /* 
-// fix this for post request using findOneAndUpdate
+// fix this for put request using findOneAndUpdate
 schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
