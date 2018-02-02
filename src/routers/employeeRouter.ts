@@ -9,8 +9,7 @@ export class EmployeeRouter {
         this.router = Router();
         this.routes();
     }
-    public getAll(req: Request, res: Response): void {
-
+    public getEmployees(req: Request, res: Response): void {
         const status = res.statusCode;
         Employee.find({})
             .then((data) => {
@@ -28,7 +27,7 @@ export class EmployeeRouter {
             });
 
     }
-    public getOne(req: Request, res: Response): void {
+    public getEmployee(req: Request, res: Response): void {
         const id = req.params.id;
         if (!ObjectID.isValid(id)) {
             console.log("invalid objectid");
@@ -40,7 +39,7 @@ export class EmployeeRouter {
         Employee.findById(id)
             .then((data) => {
                 if (!data) {
-                    return res.status(404).json({
+                     res.status(404).json({
                         status: res.statusCode,
                         message: "Data not found"
                     });
@@ -59,7 +58,7 @@ export class EmployeeRouter {
                 });
             });
     }
-    public createOne(req: Request, res: Response): void {
+    public createEmployee(req: Request, res: Response): void {
         const firstName: string = req.body.firstName;
         const lastName: string = req.body.lastName;
         const email: string = req.body.email;
@@ -89,10 +88,76 @@ export class EmployeeRouter {
                 });
             });
     }
+    public deleteEmployee(req: Request, res: Response): void {
+        const id = req.params.id;
+        if (!ObjectID.isValid(id)) {
+            console.log("invalid objectid");
+            res.status(404).json({
+                status: res.statusCode,
+                message: "invalid ObjectID"
+            });
+        }
+        Employee.findByIdAndRemove(id)
+        .then((data) => {
+            if (!data) {
+                res.status(404).json({
+                   status: res.statusCode,
+                   message: "Data not found"
+               });
+           }
+            const status = res.statusCode;
+            res.json({
+                status,
+                data
+            });
+        })
+        .catch((err) => {
+            const status = res.statusCode;
+            res.json({
+                status,
+                err
+            });
+        });
+
+    }
+    public updateEmployee(req: Request, res: Response): void {
+        const id = req.params.id;
+        if (!ObjectID.isValid(id)) {
+            console.log("invalid objectid");
+            res.status(404).json({
+                status: res.statusCode,
+                message: "invalid ObjectID"
+            });
+        }
+        Employee.findByIdAndUpdate(id, req.body)
+        .then((data) => {
+            if (!data) {
+                res.status(404).json({
+                   status: res.statusCode,
+                   message: "Data not found"
+               });
+           }
+           const status = res.statusCode;
+           res.json({
+               status,
+               message: "Data updated"
+            });
+        })
+        .catch((err) => {
+            const status = res.statusCode;
+            res.json({
+                status,
+                err
+            });
+        });
+
+    }
     public routes() {
-        this.router.get("/", this.getAll);
-        this.router.get("/:id", this.getOne);
-        this.router.post("/", this.createOne);
+        this.router.get("/", this.getEmployees);
+        this.router.get("/:id", this.getEmployee);
+        this.router.post("/", this.createEmployee);
+        this.router.delete("/:id", this.deleteEmployee);
+        this.router.put("/:id", this.updateEmployee);
     }
 }
 // export
