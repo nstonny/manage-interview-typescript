@@ -1,5 +1,5 @@
-export interface IPerson{
-    firstName: String,
-    lastName: String,
-    email?  : String
+export interface IPerson {
+    firstName: string;
+    lastName: string;
+    email?: string;
 }

@@ -1,58 +1,57 @@
-//TODO
-//properties: name
-//add dependency of availabilities
+// TODO
+// properties: name
+// add dependency of availabilities
 
-import { Schema, Document, model} from 'mongoose';
-import {IPerson} from '../interfaces/person';
+import { Document, model, Schema } from "mongoose";
+import { IPerson } from "../interfaces/person";
 
-export interface IEmployee extends IPerson, Document{
-    department: String;
-    position: String;
+export interface IEmployee extends IPerson, Document {
+    department: string;
+    position: string;
 }
 
-let EmployeeSchema: Schema = new Schema({
+const EmployeeSchema: Schema = new Schema({
     createdAt: {
         default: Date.now,
-        type: Date,
-        required: true
-    },
-    firstName:{
-    type: String,
-    trim: true,
-    default: '',
-    required: true
-    },
-    lastName:{
-        type: String,
-        trim: true,
-        default: '',
-        required: true
-    },
-    email: { 
-        type: String,
-        trim: true,
-        lowercase: true,
-        default: '',
         required: true,
-        unique: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+        type: Date
     },
-    department:{
-        type: String,
-        trim:true,
-        default: ''
-    },
-    position:{
-        type: String,
+    department: {
+        default: "",
         trim: true,
-        default: ''
+        type: String
+    },
+    email: {
+        default: "",
+        lowercase: true,
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, "Please fill a valid email address"],
+        required: true,
+        trim: true,
+        type: String,
+        unique: true
+    },
+    firstName: {
+        default: "",
+        required: true,
+        trim: true,
+        type: String
+    },
+    lastName: {
+        default: "",
+        required: true,
+        trim: true,
+        type: String
+    },
+    position: {
+        default: "",
+        trim: true,
+        type: String
     }
 });
-/* 
+/*
 // fix this for put request using findOneAndUpdate
 schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
   */
-export default model<IEmployee>('Employee', EmployeeSchema);
-
+export default model<IEmployee>("Employee", EmployeeSchema);
