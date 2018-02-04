@@ -18,7 +18,6 @@ function normalizePort(val: number | string): number | string | boolean {
   const port: number = (typeof val === "string") ? parseInt(val, 10) : val;
   if (isNaN(port)) { return val; } else if (port >= 0) { return port; } else { return false; }
 }
-
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== "listen") { throw error; }
   const bind = (typeof port === "string") ? "Pipe " + port : "Port " + port;
@@ -35,7 +34,6 @@ function onError(error: NodeJS.ErrnoException): void {
       throw error;
   }
 }
-
 function onListening(): void {
   const addr = server.address();
   const bind = (typeof addr === "string") ? `pipe ${addr}` : `port ${addr.port}`;

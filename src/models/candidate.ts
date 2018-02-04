@@ -4,18 +4,18 @@
 import { Document, model, Schema } from "mongoose";
 import { IPerson } from "../interfaces/person";
 
-export interface IEmployee extends IPerson, Document {
-    department: string;
-    position: string;
+export interface ICandidate extends IPerson, Document {
+    positionAppliedFor: string;
+    interviewers: string;
 }
 
-const EmployeeSchema: Schema = new Schema({
+const CandidateSchema: Schema = new Schema({
     createdAt: {
         default: Date.now,
         required: true,
         type: Date
     },
-    department: {
+    interviewers: {
         default: "",
         trim: true,
         type: String
@@ -41,7 +41,7 @@ const EmployeeSchema: Schema = new Schema({
         trim: true,
         type: String
     },
-    position: {
+    positionAppliedFor: {
         default: "",
         trim: true,
         type: String
@@ -53,4 +53,4 @@ schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
   */
-export default model<IEmployee>("Employee", EmployeeSchema);
+export default model<ICandidate>("Candidate", CandidateSchema);

@@ -3,14 +3,15 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as mongoose from "mongoose";
 import * as logger from "morgan";
+import CandidateRouter from "./routers/candidateRouter";
 import EmployeeRouter from "./routers/employeeRouter";
+
 // import * as helmet from 'helmet';
 // import * as cors from 'cors';
 
 // Server class
 class Server {
     public app: express.Application;
-
     constructor() {
         this.app = express();
         this.config();
@@ -31,6 +32,7 @@ class Server {
         });
         this.app.use("/", router);
         this.app.use("/api/v1/empolyees", EmployeeRouter);
+        this.app.use("/api/v1/candidates", CandidateRouter);
     }
     private middleware() {
         this.app.use(bodyParser.urlencoded({ extended: true }));
