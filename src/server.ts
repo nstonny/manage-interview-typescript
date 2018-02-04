@@ -21,7 +21,12 @@ class Server {
     public config() {
         // setup mongoose
         const MONGO_URI = "mongodb://localhost/manage-interview";
-        mongoose.connect(MONGO_URI || process.env.MONGODB_URI);
+        mongoose.connect(MONGO_URI || process.env.MONGODB_URI, (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Successfully connected to mongodb");
+        });
     }
     public routes(): void {
         const router: express.Router = express.Router();
