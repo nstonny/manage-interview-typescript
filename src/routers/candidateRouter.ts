@@ -11,7 +11,17 @@ export class CandidateRouter {
     }
     public getCandidates(req: Request, res: Response): void {
         const status = res.statusCode;
-        Candidate.find({}).populate("employees", "firstName lastName email department position availabilities")
+        Candidate.find({})
+            .populate({
+                path: "employees",
+                model: "Employee",
+                select: "firstName lastName email department position",
+                populate: {
+                    path: "availabilities",
+                    model: "Availability",
+                    select: "day time"
+                }
+            })
             .then((data) => {
                 res.json({
                     status,
@@ -37,10 +47,19 @@ export class CandidateRouter {
             });
         }
         Candidate.findById(id)
-            .populate("employees", "firstName lastName email department position availabilities")
+            .populate({
+                path: "employees",
+                model: "Employee",
+                select: "firstName lastName email department position",
+                populate: {
+                    path: "availabilities",
+                    model: "Availability",
+                    select: "day time"
+                }
+            })
             .then((data) => {
                 if (!data) {
-                     res.status(404).json({
+                    res.status(404).json({
                         status: res.statusCode,
                         message: "Data not found"
                     });
@@ -99,26 +118,26 @@ export class CandidateRouter {
             });
         }
         Candidate.findByIdAndRemove(id)
-        .then((data) => {
-            if (!data) {
-                res.status(404).json({
-                   status: res.statusCode,
-                   message: "Data not found"
-               });
-           }
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
+            .then((data) => {
+                if (!data) {
+                    res.status(404).json({
+                        status: res.statusCode,
+                        message: "Data not found"
+                    });
+                }
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    data
+                });
+            })
+            .catch((err) => {
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    err
+                });
             });
-        })
-        .catch((err) => {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
-        });
 
     }
     public updateCandidate(req: Request, res: Response): void {
@@ -130,27 +149,27 @@ export class CandidateRouter {
                 message: "invalid ObjectID"
             });
         }
-        Candidate.findByIdAndUpdate(id, {$set: req.body}, {new: true})
-        .then((data) => {
-            if (!data) {
-                res.status(404).json({
-                   status: res.statusCode,
-                   message: "Data not found"
-               });
-           }
-           const status = res.statusCode;
-           res.json({
-               status,
-               data
+        Candidate.findByIdAndUpdate(id, { $set: req.body }, { new: true })
+            .then((data) => {
+                if (!data) {
+                    res.status(404).json({
+                        status: res.statusCode,
+                        message: "Data not found"
+                    });
+                }
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    data
+                });
+            })
+            .catch((err) => {
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    err
+                });
             });
-        })
-        .catch((err) => {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
-        });
 
     }
     public routes() {
