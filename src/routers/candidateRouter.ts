@@ -11,7 +11,7 @@ export class CandidateRouter {
     }
     public getCandidates(req: Request, res: Response): void {
         const status = res.statusCode;
-        Candidate.find({})
+        Candidate.find({}).populate("interviewers", "firstName lastName email department position availabilities")
             .then((data) => {
                 res.json({
                     status,
@@ -37,6 +37,7 @@ export class CandidateRouter {
             });
         }
         Candidate.findById(id)
+            .populate("interviewers", "firstName lastName email department position availabilities")
             .then((data) => {
                 if (!data) {
                      res.status(404).json({
@@ -62,7 +63,7 @@ export class CandidateRouter {
         const firstName: string = req.body.firstName;
         const lastName: string = req.body.lastName;
         const email: string = req.body.email;
-        const interviewers: string = req.body.interviewers;
+        const interviewers: string[] = req.body.interviewers;
         const positionAppliedFor: string = req.body.positionAppliedFor;
 
         const candidate = new Candidate({
