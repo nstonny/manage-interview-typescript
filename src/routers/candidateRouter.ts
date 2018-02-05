@@ -129,7 +129,7 @@ export class CandidateRouter {
                 message: "invalid ObjectID"
             });
         }
-        Candidate.findByIdAndUpdate(id, req.body)
+        Candidate.findByIdAndUpdate(id, {$set: req.body}, {new: true})
         .then((data) => {
             if (!data) {
                 res.status(404).json({
@@ -140,7 +140,7 @@ export class CandidateRouter {
            const status = res.statusCode;
            res.json({
                status,
-               message: "Data updated"
+               data
             });
         })
         .catch((err) => {

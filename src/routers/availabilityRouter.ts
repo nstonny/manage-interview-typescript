@@ -122,7 +122,7 @@ export class AvailabilityRouter {
                 message: "invalid ObjectID"
             });
         }
-        Availability.findByIdAndUpdate(id, req.body)
+        Availability.findByIdAndUpdate(id, {$set: req.body}, {new: true})
         .then((data) => {
             if (!data) {
                 res.status(404).json({
@@ -133,7 +133,7 @@ export class AvailabilityRouter {
            const status = res.statusCode;
            res.json({
                status,
-               message: "Data updated"
+               data
             });
         })
         .catch((err) => {
