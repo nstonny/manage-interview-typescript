@@ -6,7 +6,7 @@ import { IPerson } from "../interfaces/person";
 
 export interface ICandidate extends IPerson, Document {
     positionAppliedFor: string;
-    interviewers: string[];
+    employees: string[];
 }
 
 const CandidateSchema: Schema = new Schema({
@@ -15,7 +15,7 @@ const CandidateSchema: Schema = new Schema({
         required: true,
         type: Date
     },
-    interviewers: [{
+    employees: [{
         ref: "Employee",
         type: Schema.Types.ObjectId
     }],
