@@ -11,7 +11,7 @@ export class EmployeeRouter {
     }
     public getEmployees(req: Request, res: Response): void {
         const status = res.statusCode;
-        Employee.find({})
+        Employee.find({}).populate("availabilities", "day time")
             .then((data) => {
                 res.json({
                     status,
@@ -36,7 +36,7 @@ export class EmployeeRouter {
                 message: "invalid ObjectID"
             });
         }
-        Employee.findById(id)
+        Employee.findById(id).populate("availabilities", "day time")
             .then((data) => {
                 if (!data) {
                      res.status(404).json({
@@ -64,13 +64,15 @@ export class EmployeeRouter {
         const email: string = req.body.email;
         const department: string = req.body.department;
         const position: string = req.body.position;
+        const availabilities: string[] = req.body.availabilities;
 
         const employee = new Employee({
             firstName,
             lastName,
             email,
             department,
-            position
+            position,
+            availabilities
         });
         employee.save()
             .then((data) => {
