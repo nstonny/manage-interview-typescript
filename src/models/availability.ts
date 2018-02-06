@@ -17,4 +17,10 @@ const AvailabilitySchema: Schema = new Schema({
         type: String
     }
 });
+/*
+// fix this for put request using findOneAndUpdate
+schema.pre('update', function() {
+    this.update({},{ $set: { updatedAt: new Date() } });
+  });
+  */
 export default model("Availability", AvailabilitySchema);

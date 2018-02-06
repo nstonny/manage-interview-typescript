@@ -1,7 +1,5 @@
-// TODO
-// add dependency of availabilities
-
 import { Document, model, Schema } from "mongoose";
+import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 
 export interface IEmployee extends IPerson, Document {
@@ -23,11 +21,15 @@ const EmployeeSchema: Schema = new Schema({
     email: {
         default: "",
         lowercase: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, "Please fill a valid email address"],
+        minlength: 1,
         required: true,
         trim: true,
         type: String,
-        unique: true
+        unique: true,
+        validate: {
+            message: "{VALUE} is not a valid email",
+            validator: validator.isEmail
+        }
     },
     firstName: {
         default: "",

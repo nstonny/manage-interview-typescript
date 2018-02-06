@@ -2,21 +2,16 @@ import { Document, model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 
-export interface ICandidate extends IPerson, Document {
-    positionAppliedFor: string;
-    employees: string[];
+export interface IUser extends IPerson, Document {
+    username: string;
+    password: string;
 }
-
-const CandidateSchema: Schema = new Schema({
+const UserSchema: Schema = new Schema({
     createdAt: {
         default: Date.now,
         required: true,
         type: Date
     },
-    employees: [{
-        ref: "Employee",
-        type: Schema.Types.ObjectId
-    }],
     email: {
         default: "",
         lowercase: true,
@@ -42,11 +37,21 @@ const CandidateSchema: Schema = new Schema({
         trim: true,
         type: String
     },
-    positionAppliedFor: {
-        default: "",
-        trim: true,
+    password: {
+        minlength: 6,
+        required: true,
         type: String
-    }
+    },
+    tokens: [{
+        access: {
+            required: true,
+            type: String
+        },
+        token: {
+            required: true,
+            type: String
+        }
+    }]
 });
 /*
 // fix this for put request using findOneAndUpdate
@@ -54,4 +59,4 @@ schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
   */
-export default model<ICandidate>("Candidate", CandidateSchema);
+export default model<IUser>("User", UserSchema);
