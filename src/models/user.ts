@@ -53,6 +53,10 @@ const UserSchema: Schema = new Schema({
         }
     }]
 });
+UserSchema.methods.generateAuthToken = function() {
+    let user = this;
+};
+
 /*
 // fix this for put request using findOneAndUpdate
 schema.pre('update', function() {

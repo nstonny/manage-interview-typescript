@@ -1,4 +1,3 @@
-// import * as compression from 'compression';
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as mongoose from "mongoose";
@@ -6,8 +5,7 @@ import * as logger from "morgan";
 import AvailabilityRouter from "./routers/AvailabilityRouter";
 import CandidateRouter from "./routers/candidateRouter";
 import EmployeeRouter from "./routers/employeeRouter";
-// import * as helmet from 'helmet';
-// import * as cors from 'cors';
+import UserRouter from "./routers/userRouter";
 
 // Server class
 class Server {
@@ -33,6 +31,7 @@ class Server {
             });
         });
         this.app.use("/", router);
+        this.app.use("/api/v1/users", UserRouter);
         this.app.use("/api/v1/empolyees", EmployeeRouter);
         this.app.use("/api/v1/candidates", CandidateRouter);
         this.app.use("/api/v1/availabilities", AvailabilityRouter);
@@ -41,8 +40,6 @@ class Server {
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(bodyParser.json());
         this.app.use(logger("dev"));
-        // this.app.use(helmet());
-        // this.app.use(cors());
     }
 }
 export default new Server().app;
