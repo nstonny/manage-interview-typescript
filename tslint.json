@@ -4,7 +4,8 @@
     "curly": true,
     "triple-equals": true,
     "radix": false,
-    "no-console":false
+    "no-console":false,
+    "trailing-comma":false
   },
   "jsRules": {    
     "curly": true

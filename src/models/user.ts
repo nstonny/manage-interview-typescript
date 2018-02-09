@@ -3,10 +3,13 @@ import { Document, Model, model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 
-export interface IUser extends IPerson, Document {
+export interface IUserDocument extends IPerson, Document {
     username: string;
     password: string;
-    generateAuthToken();
+    generateAuthToken(): Promise<any>;
+}
+export interface IUserModel extends Model<IUserDocument> {
+    findByToken(token): Promise<any>;
 }
 
 const UserSchema: Schema = new Schema({
@@ -57,21 +60,36 @@ const UserSchema: Schema = new Schema({
     }]
 });
 
-UserSchema.methods.toJSON = function() {
+UserSchema.methods.toJSON = function () {
     let user = this;
     let userObject = user.toObject();
-    return {id: userObject._id, email: userObject.email};
+    return { id: userObject._id, email: userObject.email };
 };
-UserSchema.methods.generateAuthToken = async function() {
+UserSchema.methods.generateAuthToken = async function () {
     let user = this;
     const access = "auth";
-    const token = jwt.sign({_id: user._id.toHexString(), access}, "abc123").toString();
-    user.tokens.push({access, token});
+    const token = jwt.sign({ _id: user._id.toHexString(), access }, "abc123").toString();
+    user.tokens.push({ access, token });
+    // see if a new Promise can be returned
     return user.save()
-    .then(() => {
-        return token;
-    });
+        .then(() => {
+            return token;
+        });
 };
+UserSchema.statics.findByToken = async function(token) {
+    let User = this;
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(token, "abc123");
+    } catch (e) {
+        return Promise.reject("unauthorized");
+    }
+    return User.findOne({
+        "_id": decodedToken._id,
+        "tokens.access": "auth",
+        "tokens.token": token
+    });
+}
 
 /*
 // fix this for put request using findOneAndUpdate
@@ -80,5 +98,5 @@ schema.pre('update', function() {
   });
   */
 
-export const User: Model<IUser> = model<IUser>("User", UserSchema);
+export const User: IUserModel = model<IUserDocument, IUserModel>("User", UserSchema);
 export default User;
