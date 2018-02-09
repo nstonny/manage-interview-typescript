@@ -1,11 +1,14 @@
-import { Document, model, Schema } from "mongoose";
+import * as jwt from "jsonwebtoken";
+import { Document, Model, model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 
 export interface IUser extends IPerson, Document {
     username: string;
     password: string;
+    generateAuthToken();
 }
+
 const UserSchema: Schema = new Schema({
     createdAt: {
         default: Date.now,
@@ -53,8 +56,21 @@ const UserSchema: Schema = new Schema({
         }
     }]
 });
+
+UserSchema.methods.toJSON = function() {
+    let user = this;
+    let userObject = user.toObject();
+    return {id: userObject._id, email: userObject.email};
+};
 UserSchema.methods.generateAuthToken = function() {
     let user = this;
+    const access = "auth";
+    const token = jwt.sign({_id: user._id.toHexString(), access}, "abc123").toString();
+    user.tokens.push({access, token});
+    return user.save()
+    .then(() => {
+        return token;
+    });
 };
 
 /*
@@ -63,4 +79,6 @@ schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
   */
-export default model<IUser>("User", UserSchema);
+
+export const User: Model<IUser> = model<IUser>("User", UserSchema);
+export default User;

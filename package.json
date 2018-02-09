@@ -21,7 +21,7 @@
     "@types/express-serve-static-core": "4.0.49",
     "@types/mocha": "^2.2.32",
     "@types/mongodb": "^3.0.5",
-    "@types/mongoose": "^5.0.0",
+    "@types/mongoose": "^5.0.1",
     "@types/morgan": "^1.7.32",
     "@types/node": "^6.0.46",
     "chai": "^3.5.0",

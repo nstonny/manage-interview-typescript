@@ -23,20 +23,23 @@ export class UserRouter {
             password
         });
         user.save()
-        .then((data) => {
-            const status = res. statusCode;
-            res.json({
-                data,
-                status
-            });
-        })
-        .catch((err) => {
+            .then(() => {
+                return user.generateAuthToken();
+            })
+            .then((token) => {
             const status = res.statusCode;
-            res.json({
-                err,
-                status
+            res.header("x-auth", token).json({
+                status,
+                user
             });
-        });
+            })
+            .catch((err) => {
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    err
+                });
+            });
     }
     public routes() {
         this.router.post("/", this.createUser);
