@@ -10,36 +10,32 @@ export class UserRouter {
         this.router = Router();
         this.routes();
     }
-    public createUser(req: Request, res: Response): void {
-        const firstName: string = req.body.firstName;
-        const lastName: string = req.body.lastName;
-        const email: string = req.body.email;
-        const password: string = req.body.password;
-
-        const user = new User({
-            firstName,
-            lastName,
-            email,
-            password
-        });
-        user.save()
-            .then(() => {
-                return user.generateAuthToken();
-            })
-            .then((token) => {
+    public async createUser(req: Request, res: Response) {
+        try {
+            const firstName: string = req.body.firstName;
+            const lastName: string = req.body.lastName;
+            const email: string = req.body.email;
+            const password: string = req.body.password;
+            const user = new User({
+                firstName,
+                lastName,
+                email,
+                password
+            });
+            await user.save();
+            const token = await user.generateAuthToken();
             const status = res.statusCode;
             res.header("x-auth", token).json({
                 status,
                 user
             });
-            })
-            .catch((err) => {
-                const status = res.statusCode;
-                res.json({
-                    status,
-                    err
-                });
+        } catch (err) {
+            const status = res.statusCode;
+            res.json({
+                status,
+                err
             });
+        }
     }
     public routes() {
         this.router.post("/", this.createUser);
