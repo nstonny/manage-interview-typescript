@@ -62,7 +62,7 @@ UserSchema.methods.toJSON = function() {
     let userObject = user.toObject();
     return {id: userObject._id, email: userObject.email};
 };
-UserSchema.methods.generateAuthToken = function() {
+UserSchema.methods.generateAuthToken = async function() {
     let user = this;
     const access = "auth";
     const token = jwt.sign({_id: user._id.toHexString(), access}, "abc123").toString();

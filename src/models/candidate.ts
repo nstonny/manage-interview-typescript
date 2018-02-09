@@ -1,4 +1,4 @@
-import { Document, model, Schema } from "mongoose";
+import { Document, model, Model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 
@@ -54,4 +54,5 @@ schema.pre('update', function() {
     this.update({},{ $set: { updatedAt: new Date() } });
   });
   */
-export default model<ICandidate>("Candidate", CandidateSchema);
+export const Candidate: Model<ICandidate> = model<ICandidate>("Candidate", CandidateSchema);
+export default Candidate;
