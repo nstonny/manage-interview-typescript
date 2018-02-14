@@ -99,11 +99,8 @@ UserSchema.statics.findByCredentials = async function(email, password) {
         }
         return new Promise(async (resolve, reject) => {
             const res = await bcrypt.compare(password, user.password);
-            if (res) {
-                resolve(user);
-            } else {
-                reject("incorrect password");
-            }
+            // refactor reject?
+            res ? resolve(user) : reject("incorrect password");
         });
     } catch (err) {
         return Promise.reject(err);

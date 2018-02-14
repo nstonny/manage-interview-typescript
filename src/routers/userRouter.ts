@@ -46,8 +46,9 @@ export class UserRouter {
             const email: string = req.body.email;
             const password: string = req.body.password;
             const user = await User.findByCredentials(email, password);
+            const token = await user.generateAuthToken();
             const status = res.statusCode;
-            res.json({
+            res.header("x-auth", token).json({
                 status,
                 user
             });
