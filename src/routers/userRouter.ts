@@ -38,12 +38,31 @@ export class UserRouter {
             });
         }
     }
-    public loginUser(req: Request, res: Response) {
+    public authenticateUser(req: Request, res: Response) {
         res.send(req.body.user);
+    }
+    public async loginUser(req: Request, res: Response) {
+        try {
+            const email: string = req.body.email;
+            const password: string = req.body.password;
+            const user = await User.findByCredentials(email, password);
+            const status = res.statusCode;
+            res.json({
+                status,
+                user
+            });
+        } catch (err) {
+            res.status(400);
+            res.json({
+                status: res.statusCode,
+                err
+            });
+        }
     }
     public routes() {
         this.router.post("/", this.createUser);
-        this.router.get("/", authenticate, this.loginUser);
+        this.router.get("/me", authenticate, this.authenticateUser);
+        this.router.post("/login", this.loginUser);
     }
 }
 const userRouter = new UserRouter();

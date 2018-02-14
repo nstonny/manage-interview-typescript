@@ -11,6 +11,7 @@ export interface IUserDocument extends IPerson, Document {
 }
 export interface IUserModel extends Model<IUserDocument> {
     findByToken(token): Promise<any>;
+    findByCredentials(email, password): Promise<any>;
 }
 const UserSchema: Schema = new Schema({
     createdAt: {
@@ -88,6 +89,26 @@ UserSchema.statics.findByToken = async function(token) {
         "tokens.access": "auth",
         "tokens.token": token
     });
+};
+UserSchema.statics.findByCredentials = async function(email, password) {
+    const User = this;
+    try {
+        const user = await User.findOne({email});
+        if (!user) {
+            return Promise.reject("no user found with that email");
+        }
+        return new Promise(async (resolve, reject) => {
+            const res = await bcrypt.compare(password, user.password);
+            if (res) {
+                resolve(user);
+            } else {
+                reject("incorrect password");
+            }
+        });
+    } catch (err) {
+        return Promise.reject(err);
+    }
+
 };
 UserSchema.pre("save", async function(next) {
     var user = this;
