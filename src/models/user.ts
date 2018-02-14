@@ -2,6 +2,7 @@ import * as jwt from "jsonwebtoken";
 import { Document, Model, model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
+import * as bcrypt from "bcryptjs";
 
 export interface IUserDocument extends IPerson, Document {
     username: string;
@@ -11,7 +12,6 @@ export interface IUserDocument extends IPerson, Document {
 export interface IUserModel extends Model<IUserDocument> {
     findByToken(token): Promise<any>;
 }
-
 const UserSchema: Schema = new Schema({
     createdAt: {
         default: Date.now,
@@ -89,6 +89,21 @@ UserSchema.statics.findByToken = async function(token) {
         "tokens.token": token
     });
 };
+UserSchema.pre("save", async function(next) {
+    var user = this;
+    try {
+        if (user.isModified("password")) {
+                const salt = await bcrypt.genSalt(10);
+                const hash = await bcrypt.hash(user.password, salt);
+                user.password = hash;
+                next();
+        } else {
+            next();
+        }
+    } catch (err) {
+        next(err);
+    }
+});
 /*
 // fix this for put request using findOneAndUpdate
 schema.pre('update', function() {

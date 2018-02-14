@@ -25,7 +25,6 @@ export class EmployeeRouter {
                     err
                 });
             });
-
     }
     public getEmployee(req: Request, res: Response): void {
         const id = req.params.id;
