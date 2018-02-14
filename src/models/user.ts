@@ -59,13 +59,12 @@ const UserSchema: Schema = new Schema({
         }
     }]
 });
-
-UserSchema.methods.toJSON = function () {
+UserSchema.methods.toJSON = function() {
     let user = this;
     let userObject = user.toObject();
     return { id: userObject._id, email: userObject.email };
 };
-UserSchema.methods.generateAuthToken = async function () {
+UserSchema.methods.generateAuthToken = async function() {
     let user = this;
     const access = "auth";
     const token = jwt.sign({ _id: user._id.toHexString(), access }, "abc123").toString();
@@ -89,8 +88,7 @@ UserSchema.statics.findByToken = async function(token) {
         "tokens.access": "auth",
         "tokens.token": token
     });
-}
-
+};
 /*
 // fix this for put request using findOneAndUpdate
 schema.pre('update', function() {

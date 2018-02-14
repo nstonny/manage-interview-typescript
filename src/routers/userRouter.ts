@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { ObjectID } from "mongodb";
-import User from "../models/user";
+import { User } from "../models/user";
+import { authenticate } from "../middlewares/authenticate";
 
 export class UserRouter {
 
@@ -37,35 +38,12 @@ export class UserRouter {
             });
         }
     }
-
-    public async loginUser(req: Request, res: Response) {
-        try {
-            const token = req.header("x-auth");
-            const user = await User.findByToken(token);
-            if (!user) {
-                res.status(404);
-                res.json({
-                    status: res.statusCode,
-                    err: "user not found"
-                });
-            } else {
-                const status = res.statusCode;
-                res.json({
-                    status,
-                    user
-                });
-            }
-        } catch (err) {
-            res.status(401);
-            res.json({
-                status: res.statusCode,
-                err
-            });
-        }
+    public loginUser(req: Request, res: Response) {
+        res.send(req.body.user);
     }
     public routes() {
         this.router.post("/", this.createUser);
-        this.router.get("/", this.loginUser);
+        this.router.get("/", authenticate, this.loginUser);
     }
 }
 const userRouter = new UserRouter();
