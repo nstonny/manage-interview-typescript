@@ -4,9 +4,7 @@ import { User } from "../models/user";
 import { authenticate } from "../middlewares/authenticate";
 
 export class UserRouter {
-
     public router: Router;
-
     constructor() {
         this.router = Router();
         this.routes();
@@ -60,10 +58,26 @@ export class UserRouter {
             });
         }
     }
+    public async logoutUser(req: Request, res: Response) {
+        try {
+            await req.body.user.removeToken(req.body.token);
+            const status = res.statusCode;
+            res.json({
+                status
+            });
+        } catch (err) {
+            const status = res.statusCode;
+            res.json({
+                status,
+                err
+            });
+        }
+    }
     public routes() {
         this.router.post("/", this.createUser);
         this.router.get("/me", authenticate, this.authenticateUser);
         this.router.post("/login", this.loginUser);
+        this.router.delete("/logout", authenticate, this.logoutUser);
     }
 }
 const userRouter = new UserRouter();

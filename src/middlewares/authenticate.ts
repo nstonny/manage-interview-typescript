@@ -6,11 +6,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         const token = req.header("x-auth");
         const user = await User.findByToken(token);
         if (!user) {
-            res.status(404);
-            res.json({
-                status: res.statusCode,
-                err: "user not found"
-            });
+            Promise.reject("unauthorized");
         }
         req.body.user = user;
         req.body.token = token;

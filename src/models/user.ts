@@ -76,6 +76,15 @@ UserSchema.methods.generateAuthToken = async function() {
             return token;
         });
 };
+UserSchema.methods.removeToken = async function(token) {
+    const user = this;
+    // see if a new Promise can be returned
+    return user.update({
+        $pull: {
+            tokens: {token}
+        }
+    });
+};
 UserSchema.statics.findByToken = async function(token) {
     let User = this;
     let decodedToken;
