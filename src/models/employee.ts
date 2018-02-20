@@ -55,7 +55,7 @@ const EmployeeSchema: Schema = new Schema({
     _creator: {
         required: true,
         type: Schema.Types.ObjectId
-    },
+    }
 });
 /*
 // fix this for put request using findOneAndUpdate

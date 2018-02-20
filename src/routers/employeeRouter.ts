@@ -72,7 +72,6 @@ export class EmployeeRouter {
         const position: string = req.body.position;
         const availabilities: string[] = req.body.availabilities;
         const _creator = req.body.user._id;
-        console.log(_creator);
 
         const employee = new Employee({
             firstName,
@@ -145,7 +144,7 @@ export class EmployeeRouter {
                 message: "invalid ObjectID"
             });
         }
-        Employee.findOneAndUpdate({_id, _creator}, {$set: req.body}, { runValidators: true, new: true })
+        Employee.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
         .then((data) => {
             if (!data) {
                 res.status(404).json({

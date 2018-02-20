@@ -46,6 +46,10 @@ const CandidateSchema: Schema = new Schema({
         default: "",
         trim: true,
         type: String
+    },
+    _creator: {
+        required: true,
+        type: Schema.Types.ObjectId
     }
 });
 /*
