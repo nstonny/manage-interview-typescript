@@ -51,7 +51,11 @@ const EmployeeSchema: Schema = new Schema({
     availabilities: [{
         ref: "Availability",
         type: Schema.Types.ObjectId
-    }]
+    }],
+    _creator: {
+        required: true,
+        type: Schema.Types.ObjectId
+    },
 });
 /*
 // fix this for put request using findOneAndUpdate
