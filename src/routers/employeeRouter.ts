@@ -108,7 +108,7 @@ export class EmployeeRouter {
                 message: "invalid ObjectID"
             });
         }
-        Employee.remove({
+        Employee.findOneAndRemove({
             _id,
             _creator
         })

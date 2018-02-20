@@ -15,6 +15,10 @@ const AvailabilitySchema: Schema = new Schema({
         required: true,
         trim: true,
         type: String
+    },
+    _creator: {
+        required: true,
+        type: Schema.Types.ObjectId
     }
 });
 /*
