@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { ObjectID } from "mongodb";
 import Availability from "../models/availability";
+import { authenticate } from "../middlewares/authenticate";
 
 export class AvailabilityRouter {
     public router: Router;
@@ -11,7 +12,10 @@ export class AvailabilityRouter {
     }
     public getAvailabilities(req: Request, res: Response): void {
         const status = res.statusCode;
-        Availability.find({})
+        const _creator = req.body.user._id;
+        Availability.find({
+            _creator
+        })
             .then((data) => {
                 res.json({
                     status,
@@ -28,15 +32,19 @@ export class AvailabilityRouter {
 
     }
     public getAvailability(req: Request, res: Response): void {
-        const id = req.params.id;
-        if (!ObjectID.isValid(id)) {
+        const _id = req.params.id;
+        const _creator = req.body.user._id;
+        if (!ObjectID.isValid(_id)) {
             console.log("invalid objectid");
             res.status(404).json({
                 status: res.statusCode,
                 message: "invalid ObjectID"
             });
         }
-        Availability.findById(id)
+        Availability.find({
+            _id,
+            _creator
+        })
             .then((data) => {
                 if (!data) {
                      res.status(404).json({
@@ -61,9 +69,11 @@ export class AvailabilityRouter {
     public createAvailability(req: Request, res: Response): void {
         const day: string = req.body.day;
         const time: string = req.body.time;
+        const _creator = req.body.user._id;
         const availability = new Availability({
             day,
-            time
+            time,
+            _creator
         });
         availability.save()
             .then((data) => {
@@ -82,15 +92,20 @@ export class AvailabilityRouter {
             });
     }
     public deleteAvailability(req: Request, res: Response): void {
-        const id = req.params.id;
-        if (!ObjectID.isValid(id)) {
+        const _id = req.params.id;
+        const _creator = req.body.user._id;
+
+        if (!ObjectID.isValid(_id)) {
             console.log("invalid objectid");
             res.status(404).json({
                 status: res.statusCode,
                 message: "invalid ObjectID"
             });
         }
-        Availability.findByIdAndRemove(id)
+        Availability.findOneAndRemove({
+            _id,
+            _creator
+        })
         .then((data) => {
             if (!data) {
                 res.status(404).json({
@@ -114,15 +129,17 @@ export class AvailabilityRouter {
 
     }
     public updateAvailability(req: Request, res: Response): void {
-        const id = req.params.id;
-        if (!ObjectID.isValid(id)) {
+        const _id = req.params.id;
+        const _creator = req.body.user._id;
+        
+        if (!ObjectID.isValid(_id)) {
             console.log("invalid objectid");
             res.status(404).json({
                 status: res.statusCode,
                 message: "invalid ObjectID"
             });
         }
-        Availability.findByIdAndUpdate(id, {$set: req.body}, {new: true})
+        Availability.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
         .then((data) => {
             if (!data) {
                 res.status(404).json({
@@ -146,11 +163,11 @@ export class AvailabilityRouter {
 
     }
     public routes() {
-        this.router.get("/", this.getAvailabilities);
-        this.router.get("/:id", this.getAvailability);
-        this.router.post("/", this.createAvailability);
-        this.router.delete("/:id", this.deleteAvailability);
-        this.router.put("/:id", this.updateAvailability);
+        this.router.get("/", authenticate, this.getAvailabilities);
+        this.router.get("/:id", authenticate, this.getAvailability);
+        this.router.post("/", authenticate, this.createAvailability);
+        this.router.delete("/:id", authenticate, this.deleteAvailability);
+        this.router.put("/:id", authenticate, this.updateAvailability);
     }
 }
 // export
