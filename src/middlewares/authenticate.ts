@@ -1,5 +1,5 @@
-import {Request, Response, NextFunction} from "express";
-import {User} from "../models/user";
+import { Request, Response, NextFunction } from "express";
+import { User } from "../models/user";
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {

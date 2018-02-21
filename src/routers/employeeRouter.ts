@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { ObjectID } from "mongodb";
+import {Request, Response, Router } from "express";
 import Employee from "../models/employee";
 import { authenticate } from "../middlewares/authenticate";
+import { validateObjectID } from "../middlewares/validateObjectID";
 
 export class EmployeeRouter {
     public router: Router;
@@ -32,13 +32,6 @@ export class EmployeeRouter {
     public getEmployee(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Employee.find({
             _id,
             _creator
@@ -101,13 +94,6 @@ export class EmployeeRouter {
     public deleteEmployee(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Employee.findOneAndRemove({
             _id,
             _creator
@@ -137,41 +123,34 @@ export class EmployeeRouter {
     public updateEmployee(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Employee.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
-        .then((data) => {
-            if (!data) {
-                res.status(404).json({
-                   status: res.statusCode,
-                   message: "Data not found"
-               });
-           }
-           const status = res.statusCode;
-           res.json({
-               status,
-               data
+            .then((data) => {
+                if (!data) {
+                    res.status(404).json({
+                        status: res.statusCode,
+                        message: "Data not found"
+                    });
+                }
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    data
+                });
+            })
+            .catch((err) => {
+                const status = res.statusCode;
+                res.json({
+                    status,
+                    err
+                });
             });
-        })
-        .catch((err) => {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
-        });
     }
     public routes() {
         this.router.get("/", authenticate, this.getEmployees);
-        this.router.get("/:id", authenticate, this.getEmployee);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getEmployee);
         this.router.post("/", authenticate, this.createEmployee);
-        this.router.delete("/:id", authenticate, this.deleteEmployee);
-        this.router.put("/:id", authenticate, this.updateEmployee);
+        this.router.delete("/:id", [authenticate, validateObjectID], this.deleteEmployee);
+        this.router.put("/:id", [authenticate, validateObjectID], this.updateEmployee);
     }
 }
 // export

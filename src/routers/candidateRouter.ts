@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { ObjectID } from "mongodb";
+import {  Request, Response, Router } from "express";
 import Candidate from "../models/candidate";
 import { authenticate } from "../middlewares/authenticate";
+import { validateObjectID } from "../middlewares/validateObjectID";
 
 export class CandidateRouter {
     public router: Router;
@@ -43,13 +43,6 @@ export class CandidateRouter {
     public getCandidate(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Candidate.find({
             _id,
             _creator
@@ -120,13 +113,6 @@ export class CandidateRouter {
     public deleteCandidate(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Candidate.findOneAndRemove({
             _id,
             _creator
@@ -156,13 +142,6 @@ export class CandidateRouter {
     public updateCandidate(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Candidate.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
             .then((data) => {
                 if (!data) {
@@ -188,10 +167,10 @@ export class CandidateRouter {
     }
     public routes() {
         this.router.get("/", authenticate, this.getCandidates);
-        this.router.get("/:id", authenticate, this.getCandidate);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getCandidate);
         this.router.post("/", authenticate, this.createCandidate);
-        this.router.delete("/:id", authenticate, this.deleteCandidate);
-        this.router.put("/:id", authenticate, this.updateCandidate);
+        this.router.delete("/:id", [authenticate, validateObjectID], this.deleteCandidate);
+        this.router.put("/:id", [authenticate, validateObjectID], this.updateCandidate);
     }
 }
 // export

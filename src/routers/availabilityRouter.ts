@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { ObjectID } from "mongodb";
 import Availability from "../models/availability";
 import { authenticate } from "../middlewares/authenticate";
+import { validateObjectID } from "../middlewares/validateObjectID";
 
 export class AvailabilityRouter {
     public router: Router;
@@ -34,13 +34,6 @@ export class AvailabilityRouter {
     public getAvailability(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Availability.find({
             _id,
             _creator
@@ -94,14 +87,6 @@ export class AvailabilityRouter {
     public deleteAvailability(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Availability.findOneAndRemove({
             _id,
             _creator
@@ -131,14 +116,6 @@ export class AvailabilityRouter {
     public updateAvailability(req: Request, res: Response): void {
         const _id = req.params.id;
         const _creator = req.body.user._id;
-        
-        if (!ObjectID.isValid(_id)) {
-            console.log("invalid objectid");
-            res.status(404).json({
-                status: res.statusCode,
-                message: "invalid ObjectID"
-            });
-        }
         Availability.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
         .then((data) => {
             if (!data) {
@@ -164,10 +141,10 @@ export class AvailabilityRouter {
     }
     public routes() {
         this.router.get("/", authenticate, this.getAvailabilities);
-        this.router.get("/:id", authenticate, this.getAvailability);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getAvailability);
         this.router.post("/", authenticate, this.createAvailability);
-        this.router.delete("/:id", authenticate, this.deleteAvailability);
-        this.router.put("/:id", authenticate, this.updateAvailability);
+        this.router.delete("/:id", [authenticate, validateObjectID], this.deleteAvailability);
+        this.router.put("/:id", [authenticate, validateObjectID], this.updateAvailability);
     }
 }
 // export
