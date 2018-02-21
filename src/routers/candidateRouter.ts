@@ -2,6 +2,7 @@ import {  Request, Response, Router } from "express";
 import Candidate from "../models/candidate";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
+import * as _ from "lodash";
 
 export class CandidateRouter {
     public router: Router;
@@ -11,7 +12,6 @@ export class CandidateRouter {
         this.routes();
     }
     public getCandidates(req: Request, res: Response): void {
-        const status = res.statusCode;
         Candidate.find({
             _creator: req.body.user._id
         })
@@ -26,6 +26,7 @@ export class CandidateRouter {
                 }
             })
             .then((data) => {
+                const status = res.statusCode;
                 res.json({
                     status,
                     data
@@ -38,14 +39,11 @@ export class CandidateRouter {
                     err
                 });
             });
-
     }
     public getCandidate(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Candidate.find({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         })
             .populate({
                 path: "employees",
@@ -79,21 +77,10 @@ export class CandidateRouter {
             });
     }
     public createCandidate(req: Request, res: Response): void {
-        const firstName: string = req.body.firstName;
-        const lastName: string = req.body.lastName;
-        const email: string = req.body.email;
-        const employees: string[] = req.body.employees;
-        const positionAppliedFor: string = req.body.positionAppliedFor;
         const _creator = req.body.user._id;
-
-        const candidate = new Candidate({
-            firstName,
-            lastName,
-            email,
-            employees,
-            positionAppliedFor,
-            _creator
-        });
+        const body = _.pick(req.body, ["firstName", "lastName", "email",
+                                       "employees", "positionAppliedFor"]);
+        const candidate = new Candidate({ ...body, _creator });
         candidate.save()
             .then((data) => {
                 const status = res.statusCode;
@@ -111,11 +98,9 @@ export class CandidateRouter {
             });
     }
     public deleteCandidate(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Candidate.findOneAndRemove({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         })
             .then((data) => {
                 if (!data) {
@@ -140,9 +125,9 @@ export class CandidateRouter {
 
     }
     public updateCandidate(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
-        Candidate.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
+        Candidate.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
+            { $set: req.body },
+            { runValidators: true, new: true })
             .then((data) => {
                 if (!data) {
                     res.status(404).json({

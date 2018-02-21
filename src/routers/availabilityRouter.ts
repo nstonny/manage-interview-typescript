@@ -1,7 +1,8 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import Availability from "../models/availability";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
+import * as _ from "lodash";
 
 export class AvailabilityRouter {
     public router: Router;
@@ -11,12 +12,11 @@ export class AvailabilityRouter {
         this.routes();
     }
     public getAvailabilities(req: Request, res: Response): void {
-        const status = res.statusCode;
-        const _creator = req.body.user._id;
         Availability.find({
-            _creator
+            _creator: req.body.user._id
         })
             .then((data) => {
+                const status = res.statusCode;
                 res.json({
                     status,
                     data
@@ -29,14 +29,11 @@ export class AvailabilityRouter {
                     err
                 });
             });
-
     }
     public getAvailability(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Availability.find({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         })
             .then((data) => {
                 if (!data) {
@@ -60,14 +57,9 @@ export class AvailabilityRouter {
             });
     }
     public createAvailability(req: Request, res: Response): void {
-        const day: string = req.body.day;
-        const time: string = req.body.time;
         const _creator = req.body.user._id;
-        const availability = new Availability({
-            day,
-            time,
-            _creator
-        });
+        const body = _.pick(req.body, ["day", "time"]);
+        const availability = new Availability({ ...body, _creator });
         availability.save()
             .then((data) => {
                 const status = res.statusCode;
@@ -85,11 +77,9 @@ export class AvailabilityRouter {
             });
     }
     public deleteAvailability(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Availability.findOneAndRemove({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         })
         .then((data) => {
             if (!data) {
@@ -111,12 +101,11 @@ export class AvailabilityRouter {
                 err
             });
         });
-
     }
     public updateAvailability(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
-        Availability.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
+        Availability.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id},
+            { $set: req.body },
+            { runValidators: true, new: true })
         .then((data) => {
             if (!data) {
                 res.status(404).json({
@@ -137,7 +126,6 @@ export class AvailabilityRouter {
                 err
             });
         });
-
     }
     public routes() {
         this.router.get("/", authenticate, this.getAvailabilities);

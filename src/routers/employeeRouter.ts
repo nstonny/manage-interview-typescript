@@ -1,7 +1,8 @@
-import {Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import Employee from "../models/employee";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
+import * as _ from "lodash";
 
 export class EmployeeRouter {
     public router: Router;
@@ -11,11 +12,11 @@ export class EmployeeRouter {
         this.routes();
     }
     public getEmployees(req: Request, res: Response): void {
-        const status = res.statusCode;
         Employee.find({
             _creator: req.body.user._id
         }).populate("availabilities", "day time")
             .then((data) => {
+                const status = res.statusCode;
                 res.json({
                     status,
                     data
@@ -30,11 +31,9 @@ export class EmployeeRouter {
             });
     }
     public getEmployee(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Employee.find({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         }).populate("availabilities", "day time")
             .then((data) => {
                 if (!data) {
@@ -58,23 +57,10 @@ export class EmployeeRouter {
             });
     }
     public createEmployee(req: Request, res: Response): void {
-        const firstName: string = req.body.firstName;
-        const lastName: string = req.body.lastName;
-        const email: string = req.body.email;
-        const department: string = req.body.department;
-        const position: string = req.body.position;
-        const availabilities: string[] = req.body.availabilities;
         const _creator = req.body.user._id;
-
-        const employee = new Employee({
-            firstName,
-            lastName,
-            email,
-            department,
-            position,
-            availabilities,
-            _creator
-        });
+        const body = _.pick(req.body, ["firstName", "lastName", "email",
+                                       "department", "position", "availabilities"]);
+        const employee = new Employee({ ...body, _creator});
         employee.save()
             .then((data) => {
                 const status = res.statusCode;
@@ -92,11 +78,9 @@ export class EmployeeRouter {
             });
     }
     public deleteEmployee(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
         Employee.findOneAndRemove({
-            _id,
-            _creator
+            _id: req.params.id,
+            _creator: req.body.user._id
         })
             .then((data) => {
                 if (!data) {
@@ -121,9 +105,9 @@ export class EmployeeRouter {
 
     }
     public updateEmployee(req: Request, res: Response): void {
-        const _id = req.params.id;
-        const _creator = req.body.user._id;
-        Employee.findOneAndUpdate({ _id, _creator }, { $set: req.body }, { runValidators: true, new: true })
+        Employee.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
+            { $set: req.body },
+            { runValidators: true, new: true })
             .then((data) => {
                 if (!data) {
                     res.status(404).json({

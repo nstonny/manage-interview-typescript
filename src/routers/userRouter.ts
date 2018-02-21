@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { ObjectID } from "mongodb";
+import { Request, Response, Router } from "express";
 import { User } from "../models/user";
 import { authenticate } from "../middlewares/authenticate";
+import * as _ from "lodash";
 
 export class UserRouter {
     public router: Router;
@@ -11,16 +11,8 @@ export class UserRouter {
     }
     public async createUser(req: Request, res: Response) {
         try {
-            const firstName: string = req.body.firstName;
-            const lastName: string = req.body.lastName;
-            const email: string = req.body.email;
-            const password: string = req.body.password;
-            const user = new User({
-                firstName,
-                lastName,
-                email,
-                password
-            });
+            const body = _.pick(req.body, ["firstName", "lastName", "email", "password"]);
+            const user = new User({ ...body });
             await user.save();
             const token = await user.generateAuthToken();
             const status = res.statusCode;
@@ -41,9 +33,7 @@ export class UserRouter {
     }
     public async loginUser(req: Request, res: Response) {
         try {
-            const email: string = req.body.email;
-            const password: string = req.body.password;
-            const user = await User.findByCredentials(email, password);
+            const user = await User.findByCredentials(req.body.email, req.body.password);
             const token = await user.generateAuthToken();
             const status = res.statusCode;
             res.header("x-auth", token).json({
