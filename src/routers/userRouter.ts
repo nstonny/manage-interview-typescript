@@ -13,12 +13,12 @@ export class UserRouter {
         try {
             const body = _.pick(req.body, ["firstName", "lastName", "email", "password"]);
             const user = new User({ ...body });
-            await user.save();
+            const data = await user.save();
             const token = await user.generateAuthToken();
             const status = res.statusCode;
             res.header("x-auth", token).json({
                 status,
-                user
+                data
             });
         } catch (err) {
             const status = res.statusCode;

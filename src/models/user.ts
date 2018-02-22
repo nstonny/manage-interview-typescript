@@ -3,6 +3,7 @@ import { Document, Model, model, Schema } from "mongoose";
 import * as validator from "validator";
 import { IPerson } from "../interfaces/person";
 import * as bcrypt from "bcryptjs";
+import { resolve } from "dns";
 
 export interface IUserDocument extends IPerson, Document {
     username: string;
@@ -13,7 +14,7 @@ export interface IUserModel extends Model<IUserDocument> {
     findByToken(token): Promise<any>;
     findByCredentials(email, password): Promise<any>;
 }
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema = new Schema ({
     createdAt: {
         default: Date.now,
         required: true,
@@ -66,49 +67,65 @@ UserSchema.methods.toJSON = function() {
     return { id: userObject._id, email: userObject.email };
 };
 UserSchema.methods.generateAuthToken = async function() {
-    let user = this;
-    const access = "auth";
-    const token = jwt.sign({ _id: user._id.toHexString(), access }, "abc123").toString();
-    user.tokens.push({ access, token });
-    // see if a new Promise can be returned
-    return user.save()
-        .then(() => {
-            return token;
+    const user = this;
+    try {
+        const access = "auth";
+        const token = await jwt.sign({ _id: user._id.toHexString(), access }, "abc123").toString();
+        if (!token) {
+            return Promise.reject("could not generate auth token");
+        }
+        user.tokens.push({ access, token });
+        return new Promise(async (resolve) => {
+            await user.save();
+            resolve(token);
         });
+    } catch (err) {
+        return Promise.reject(err);
+    }
 };
 UserSchema.methods.removeToken = async function(token) {
     const user = this;
-    // see if a new Promise can be returned
-    return user.update({
-        $pull: {
-            tokens: {token}
-        }
-    });
+    try {
+        return new Promise(async (resolve) => {
+            await user.update({
+                $pull: {
+                    tokens: { token }
+                }
+            });
+            resolve();
+        });
+    } catch (err) {
+        return Promise.reject("token can not be removed");
+    }
 };
 UserSchema.statics.findByToken = async function(token) {
-    let User = this;
-    let decodedToken;
+    const User = this;
     try {
-        decodedToken = jwt.verify(token, "abc123");
-    } catch (e) {
+        const decodedToken = await jwt.verify(token, "abc123");
+        if (!decodedToken) {
+            return Promise.reject("unauthorized");
+        }
+        return new Promise(async (resolve, reject) => {
+            const user = await User.findOne({
+                "_id": decodedToken._id,
+                "tokens.access": "auth",
+                "tokens.token": token
+            });
+            user ? resolve(user) : reject("no user found");
+        });
+    } catch (err) {
         return Promise.reject("unauthorized");
     }
-    return User.findOne({
-        "_id": decodedToken._id,
-        "tokens.access": "auth",
-        "tokens.token": token
-    });
 };
 UserSchema.statics.findByCredentials = async function(email, password) {
     const User = this;
     try {
-        const user = await User.findOne({email});
+        const user = await User.findOne({ email });
         if (!user) {
             return Promise.reject("no user found with that email");
         }
         return new Promise(async (resolve, reject) => {
             const res = await bcrypt.compare(password, user.password);
-            // refactor reject?
             res ? resolve(user) : reject("incorrect password");
         });
     } catch (err) {
@@ -116,14 +133,14 @@ UserSchema.statics.findByCredentials = async function(email, password) {
     }
 
 };
-UserSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function (next) {
     var user = this;
     try {
         if (user.isModified("password")) {
-                const salt = await bcrypt.genSalt(10);
-                const hash = await bcrypt.hash(user.password, salt);
-                user.password = hash;
-                next();
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(user.password, salt);
+            user.password = hash;
+            next();
         } else {
             next();
         }
