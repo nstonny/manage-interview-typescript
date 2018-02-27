@@ -6,7 +6,8 @@
     "radix": false,
     "no-console":false,
     "trailing-comma":false,
-    "ordered-imports":false
+    "ordered-imports":false,
+    "no-string-literal": false
   },
   "jsRules": {    
     "curly": true

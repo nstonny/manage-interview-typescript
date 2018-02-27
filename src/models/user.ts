@@ -70,7 +70,7 @@ UserSchema.methods.generateAuthToken = async function() {
     const user = this;
     try {
         const access = "auth";
-        const token = await jwt.sign({ _id: user._id.toHexString(), access }, "abc123").toString();
+        const token = await jwt.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET).toString();
         if (!token) {
             return Promise.reject("could not generate auth token");
         }
@@ -101,7 +101,7 @@ UserSchema.methods.removeToken = async function(token) {
 UserSchema.statics.findByToken = async function(token) {
     const User = this;
     try {
-        const decodedToken = await jwt.verify(token, "abc123");
+        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
         if (!decodedToken) {
             return Promise.reject("unauthorized");
         }
@@ -133,7 +133,7 @@ UserSchema.statics.findByCredentials = async function(email, password) {
     }
 
 };
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function(next) {
     var user = this;
     try {
         if (user.isModified("password")) {

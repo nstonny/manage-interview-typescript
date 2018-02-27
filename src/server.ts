@@ -12,18 +12,42 @@ class Server {
     public app: express.Application;
     constructor() {
         this.app = express();
-        this.config();
+        this.database();
+        this.errorHandlers();
         this.middleware();
         this.routes();
     }
-    public config() {
-        // setup mongoose
-        const MONGO_URI = "mongodb://localhost/manage-interview";
-        mongoose.connect(MONGO_URI || process.env.MONGODB_URI)
-        .then(() => console.log("MongoDB Connected"))
-        .catch((err) => console.log(err));
+    private async database() {
+        try {
+            await mongoose.connect(process.env.MONGODB_URI);
+            console.log(`MongoDB connected to ${process.env.MONGODB_URI}`);
+        } catch (err) {
+            console.log(err);
+        }
     }
-    public routes(): void {
+    private errorHandlers(): void {
+        // development error handler
+        // will print stacktrace
+        if (process.env.NODE_ENV === "development") {
+            this.app.use((err, req, res, next) => {
+                res.status(err.status || 500);
+                res.render("error", {
+                    message: err.message,
+                    error: err
+                });
+            });
+        }
+        // production error handler
+        // no stacktraces leaked to user
+        this. app.use((err, req, res, next) => {
+            res.status(err.status || 500);
+            res.render("error", {
+                message: err.message,
+                error: {}
+            });
+        });
+    }
+    private routes(): void {
         const router: express.Router = express.Router();
         router.get("/", (req, res, next) => {
             res.json({
