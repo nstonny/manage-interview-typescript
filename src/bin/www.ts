@@ -1,5 +1,5 @@
 
-import * as dotenv from "dotenv";
+import * as dotenv from "dotenv-safe";
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env"});
 }
