@@ -6,6 +6,11 @@ const AvailabilitySchema: Schema = new Schema({
         required: true,
         type: Date
     },
+    updatedAt: {
+        default: Date.now,
+        required: true,
+        type: Date
+    },
     day: {
         required: true,
         trim: true,
@@ -21,10 +26,7 @@ const AvailabilitySchema: Schema = new Schema({
         type: Schema.Types.ObjectId
     }
 });
-/*
-// fix this for put request using findOneAndUpdate
-schema.pre('update', function() {
-    this.update({},{ $set: { updatedAt: new Date() } });
+AvailabilitySchema.pre("findOneAndUpdate", function() {
+    this.update({}, { $set: { updatedAt: new Date() } });
   });
-  */
 export default model("Availability", AvailabilitySchema);

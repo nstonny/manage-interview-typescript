@@ -20,6 +20,11 @@ const UserSchema: Schema = new Schema ({
         required: true,
         type: Date
     },
+    updatedAt: {
+        default: Date.now,
+        required: true,
+        type: Date
+    },
     email: {
         default: "",
         lowercase: true,
@@ -148,12 +153,8 @@ UserSchema.pre("save", async function(next) {
         next(err);
     }
 });
-/*
-// fix this for put request using findOneAndUpdate
-schema.pre('update', function() {
-    this.update({},{ $set: { updatedAt: new Date() } });
+UserSchema.pre("findOneAndUpdate", function() {
+    this.update({}, { $set: { updatedAt: new Date() } });
   });
-  */
-
 export const User: IUserModel = model<IUserDocument, IUserModel>("User", UserSchema);
 export default User;

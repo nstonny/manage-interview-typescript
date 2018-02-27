@@ -13,6 +13,11 @@ const CandidateSchema: Schema = new Schema({
         required: true,
         type: Date
     },
+    updatedAt: {
+        default: Date.now,
+        required: true,
+        type: Date
+    },
     employees: [{
         ref: "Employee",
         type: Schema.Types.ObjectId
@@ -52,11 +57,8 @@ const CandidateSchema: Schema = new Schema({
         type: Schema.Types.ObjectId
     }
 });
-/*
-// fix this for put request using findOneAndUpdate
-schema.pre('update', function() {
-    this.update({},{ $set: { updatedAt: new Date() } });
+CandidateSchema.pre("findOneAndUpdate", function() {
+    this.update({}, { $set: { updatedAt: new Date() } });
   });
-  */
 export const Candidate: Model<ICandidate> = model<ICandidate>("Candidate", CandidateSchema);
 export default Candidate;
