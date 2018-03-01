@@ -13,7 +13,6 @@ class Server {
     constructor() {
         this.app = express();
         this.database();
-        this.errorHandlers();
         this.middleware();
         this.routes();
     }
@@ -24,28 +23,6 @@ class Server {
         } catch (err) {
             console.log(err);
         }
-    }
-    private errorHandlers(): void {
-        // development error handler
-        // will print stacktrace
-        if (process.env.NODE_ENV === "development") {
-            this.app.use((err, req, res, next) => {
-                res.status(err.status || 500);
-                res.render("error", {
-                    message: err.message,
-                    error: err
-                });
-            });
-        }
-        // production error handler
-        // no stacktraces leaked to user
-        this. app.use((err, req, res, next) => {
-            res.status(err.status || 500);
-            res.render("error", {
-                message: err.message,
-                error: {}
-            });
-        });
     }
     private routes(): void {
         const router: express.Router = express.Router();
