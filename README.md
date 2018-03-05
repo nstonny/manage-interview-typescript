@@ -39,9 +39,6 @@ npm run dev
 When run locally, the server is set to run at http://localhost:3000 or http://127.0.0.1:3000. An appropriate message is printed on the console.
 
 ## API Documentation
-
-Instructions on how to use the APIs are provided in a pdf included in the project folder.
-The pdf can be found at
 TODO...
 
 
