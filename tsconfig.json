@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,
     "outDir": "./dist/",
     "module": "commonjs",
     "target": "es5",
@@ -10,7 +11,7 @@
   },
   "include": [
     "./src/**/*",
-    "typings.d.ts"
+    ".env"
   ],
   "exclude": [
     "node_modules"
