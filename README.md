@@ -27,9 +27,9 @@ npm i
 ```
 Run an instance of MongoDB in your machine using mongod and specifying the data folder for mongo 
 
-Compile the typescript code using 
+Compile the typescript code using gulp
 ```
-tsc
+gulp build
 ```
 
 Start the express server in development mode using
