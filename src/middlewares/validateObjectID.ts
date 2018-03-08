@@ -3,10 +3,9 @@ import { ObjectID } from "mongodb";
 
 export const validateObjectID = (req: Request, res: Response, next: NextFunction) => {
     if (!ObjectID.isValid(req.params.id)) {
-        res.status(404).json({
-            status: res.statusCode,
-            message: "invalid ObjectID"
-        });
+        const err = new Error("invalid ObjectID");
+        res.statusCode = 404;
+        next(err);
     }
     next();
 };

@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, Router, NextFunction } from "express";
 import { User } from "../models/user";
 import { authenticate } from "../middlewares/authenticate";
 import * as _ from "lodash";
@@ -9,7 +9,7 @@ export class UserRouter {
         this.router = Router();
         this.routes();
     }
-    public async createUser(req: Request, res: Response) {
+    public async createUser(req: Request, res: Response, next: NextFunction) {
         try {
             const body = _.pick(req.body, ["firstName", "lastName", "email", "password"]);
             const user = new User({ ...body });
@@ -21,17 +21,13 @@ export class UserRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
     public authenticateUser(req: Request, res: Response) {
         res.send(req.body.user);
     }
-    public async loginUser(req: Request, res: Response) {
+    public async loginUser(req: Request, res: Response, next: NextFunction) {
         try {
             const user = await User.findByCredentials(req.body.email, req.body.password);
             const token = await user.generateAuthToken();
@@ -41,14 +37,10 @@ export class UserRouter {
                 user
             });
         } catch (err) {
-            res.status(400);
-            res.json({
-                status: res.statusCode,
-                err
-            });
+            next(err);
         }
     }
-    public async logoutUser(req: Request, res: Response) {
+    public async logoutUser(req: Request, res: Response, next: NextFunction) {
         try {
             await req.body.user.removeToken(req.body.token);
             const status = res.statusCode;
@@ -56,11 +48,7 @@ export class UserRouter {
                 status
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
     public routes() {

@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, Router, NextFunction } from "express";
 import Employee from "../models/employee";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
@@ -11,7 +11,7 @@ export class EmployeeRouter {
         this.router = Router();
         this.routes();
     }
-    public async getEmployees(req: Request, res: Response) {
+    public async getEmployees(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Employee.find({
                 _creator: req.body.user._id
@@ -23,24 +23,19 @@ export class EmployeeRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async getEmployee(req: Request, res: Response) {
+    public async getEmployee(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Employee.find({
                 _id: req.params.id,
                 _creator: req.body.user._id
             }).populate("availabilities", "day time");
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -48,14 +43,10 @@ export class EmployeeRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async createEmployee(req: Request, res: Response) {
+    public async createEmployee(req: Request, res: Response, next: NextFunction) {
         try {
             const _creator = req.body.user._id;
             const body = _.pick(req.body, ["firstName", "lastName", "email",
@@ -68,24 +59,19 @@ export class EmployeeRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async deleteEmployee(req: Request, res: Response) {
+    public async deleteEmployee(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Employee.findOneAndRemove({
                 _id: req.params.id,
                 _creator: req.body.user._id
             });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -93,23 +79,18 @@ export class EmployeeRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
  }
-    public async updateEmployee(req: Request, res: Response) {
+    public async updateEmployee(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Employee.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
                 { $set: req.body },
                 { runValidators: true, new: true });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -117,11 +98,7 @@ export class EmployeeRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
     public routes() {

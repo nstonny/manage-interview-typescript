@@ -6,6 +6,7 @@ import AvailabilityRouter from "./routers/AvailabilityRouter";
 import CandidateRouter from "./routers/candidateRouter";
 import EmployeeRouter from "./routers/employeeRouter";
 import UserRouter from "./routers/userRouter";
+import { errorhandler } from "./middlewares/errorhandler";
 
 // Server class
 class Server {
@@ -15,6 +16,8 @@ class Server {
         this.database();
         this.middleware();
         this.routes();
+        this.app.use(this.notFound);
+        this.app.use(errorhandler);
     }
     private async database() {
         try {
@@ -37,10 +40,15 @@ class Server {
         this.app.use("/api/v1/candidates", CandidateRouter);
         this.app.use("/api/v1/availabilities", AvailabilityRouter);
     }
-    private middleware() {
+    private middleware(): void {
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(bodyParser.json());
         this.app.use(logger("dev"));
+    }
+    private notFound(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const err = new Error("page not found");
+        res.statusCode = 404;
+        next(err);
     }
 }
 export default new Server().app;

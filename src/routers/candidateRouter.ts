@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, Router, NextFunction } from "express";
 import Candidate from "../models/candidate";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
@@ -11,7 +11,7 @@ export class CandidateRouter {
         this.router = Router();
         this.routes();
     }
-    public async getCandidates(req: Request, res: Response) {
+    public async getCandidates(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Candidate.find({
                 _creator: req.body.user._id
@@ -32,14 +32,10 @@ export class CandidateRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async getCandidate(req: Request, res: Response) {
+    public async getCandidate(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Candidate.find({
                 _id: req.params.id,
@@ -56,10 +52,9 @@ export class CandidateRouter {
                     }
                 });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -67,14 +62,10 @@ export class CandidateRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async createCandidate(req: Request, res: Response) {
+    public async createCandidate(req: Request, res: Response, next: NextFunction) {
         try {
             const _creator = req.body.user._id;
             const body = _.pick(req.body, ["firstName", "lastName", "email",
@@ -87,24 +78,19 @@ export class CandidateRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
 }
-    public async deleteCandidate(req: Request, res: Response) {
+    public async deleteCandidate(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Candidate.findOneAndRemove({
                 _id: req.params.id,
                 _creator: req.body.user._id
             });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -112,14 +98,10 @@ export class CandidateRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
  }
-    public async updateCandidate(req: Request, res: Response) {
+    public async updateCandidate(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Candidate.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
                 { $set: req.body },
@@ -136,11 +118,7 @@ export class CandidateRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
  }
     public routes() {

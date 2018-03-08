@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, Router, NextFunction} from "express";
 import Availability from "../models/availability";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
@@ -11,7 +11,7 @@ export class AvailabilityRouter {
         this.router = Router();
         this.routes();
     }
-    public async getAvailabilities(req: Request, res: Response) {
+    public async getAvailabilities(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Availability.find({
                 _creator: req.body.user._id
@@ -22,24 +22,19 @@ export class AvailabilityRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
     }
-    public async getAvailability(req: Request, res: Response) {
+    public async getAvailability(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Availability.find({
                 _id: req.params.id,
                 _creator: req.body.user._id
             });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -47,14 +42,10 @@ export class AvailabilityRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
   }
-    public async createAvailability(req: Request, res: Response) {
+    public async createAvailability(req: Request, res: Response, next: NextFunction) {
         try {
             const _creator = req.body.user._id;
             const body = _.pick(req.body, ["day", "time"]);
@@ -66,24 +57,19 @@ export class AvailabilityRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
   }
-    public async deleteAvailability(req: Request, res: Response) {
+    public async deleteAvailability(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Availability.findOneAndRemove({
                 _id: req.params.id,
                 _creator: req.body.user._id
             });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -91,23 +77,18 @@ export class AvailabilityRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
   }
-    public async updateAvailability(req: Request, res: Response) {
+    public async updateAvailability(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await Availability.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
                 { $set: req.body },
                 { runValidators: true, new: true });
             if (!data) {
-                res.status(404).json({
-                    status: res.statusCode,
-                    message: "Data not found"
-                });
+                const err = new Error ("data not found");
+                res.statusCode = 404;
+                next(err);
             }
             const status = res.statusCode;
             res.json({
@@ -115,11 +96,7 @@ export class AvailabilityRouter {
                 data
             });
         } catch (err) {
-            const status = res.statusCode;
-            res.json({
-                status,
-                err
-            });
+            next(err);
         }
   }
     public routes() {
@@ -133,5 +110,4 @@ export class AvailabilityRouter {
 // export
 const availabilityRoutes = new AvailabilityRouter();
 availabilityRoutes.routes();
-
 export default availabilityRoutes.router;

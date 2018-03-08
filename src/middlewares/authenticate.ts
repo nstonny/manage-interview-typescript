@@ -12,10 +12,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         req.body.token = token;
         next();
     } catch (err) {
-        res.status(401);
-        res.json({
-            status: res.statusCode,
-            err
-        });
+        err = new Error ("unauthorized");
+        res.statusCode = 401;
+        next(err);
     }
 };
