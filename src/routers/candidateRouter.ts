@@ -3,6 +3,7 @@ import Candidate from "../models/candidate";
 import { authenticate } from "../middlewares/authenticate";
 import { validateObjectID } from "../middlewares/validateObjectID";
 import * as _ from "lodash";
+import { successhandler } from "../middlewares/successhandler";
 
 export class CandidateRouter {
     public router: Router;
@@ -13,7 +14,7 @@ export class CandidateRouter {
     }
     public async getCandidates(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await Candidate.find({
+            const result = await Candidate.find({
                 _creator: req.body.user._id
             })
                 .populate({
@@ -26,18 +27,14 @@ export class CandidateRouter {
                         select: "day time"
                     }
                 });
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
-            });
+            successhandler(result, req, res, next);
         } catch (err) {
             next(err);
         }
     }
-    public async getCandidate(req: Request, res: Response, next: NextFunction) {
+    public async getCandidateById(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await Candidate.find({
+            const result = await Candidate.find({
                 _id: req.params.id,
                 _creator: req.body.user._id
             })
@@ -51,80 +48,64 @@ export class CandidateRouter {
                         select: "day time"
                     }
                 });
-            if (!data) {
-                const err = new Error ("data not found");
+            if (!result) {
+                const err = new Error ("Data not found");
                 res.statusCode = 404;
                 next(err);
             }
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
-            });
+            successhandler(result, req, res, next);
         } catch (err) {
             next(err);
         }
     }
-    public async createCandidate(req: Request, res: Response, next: NextFunction) {
+    public async addCandidate(req: Request, res: Response, next: NextFunction) {
         try {
             const _creator = req.body.user._id;
             const body = _.pick(req.body, ["firstName", "lastName", "email",
                 "employees", "positionAppliedFor"]);
             const candidate = new Candidate({ ...body, _creator });
-            const data = await candidate.save();
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
-            });
+            const result = await candidate.save();
+            successhandler(result, req, res, next);
         } catch (err) {
             next(err);
         }
-}
+    }
     public async deleteCandidate(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await Candidate.findOneAndRemove({
+            const result = await Candidate.findOneAndRemove({
                 _id: req.params.id,
                 _creator: req.body.user._id
             });
-            if (!data) {
-                const err = new Error ("data not found");
+            if (!result) {
+                const err = new Error ("Data not found");
                 res.statusCode = 404;
                 next(err);
             }
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
-            });
+            successhandler(result, req, res, next);
         } catch (err) {
             next(err);
         }
- }
+    }
     public async updateCandidate(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await Candidate.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
+            const result = await Candidate.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
                 { $set: req.body },
                 { runValidators: true, new: true });
-            if (!data) {
+            if (!result) {
                 res.status(404).json({
                     status: res.statusCode,
                     message: "Data not found"
                 });
             }
-            const status = res.statusCode;
-            res.json({
-                status,
-                data
-            });
+            successhandler(result, req, res, next);
         } catch (err) {
             next(err);
         }
- }
+    }
     public routes() {
         this.router.get("/", authenticate, this.getCandidates);
-        this.router.get("/:id", [authenticate, validateObjectID], this.getCandidate);
-        this.router.post("/", authenticate, this.createCandidate);
+        this.router.post("/", authenticate, this.addCandidate);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getCandidateById);
         this.router.delete("/:id", [authenticate, validateObjectID], this.deleteCandidate);
         this.router.put("/:id", [authenticate, validateObjectID], this.updateCandidate);
     }

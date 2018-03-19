@@ -35,7 +35,7 @@ export class EmployeeRouter {
             next(err);
         }
     }
-    public async getEmployee(req: Request, res: Response, next: NextFunction) {
+    public async getEmployeeById(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await Employee.find({
                 _id: req.params.id,
@@ -85,7 +85,7 @@ export class EmployeeRouter {
     public routes() {
         this.router.post("/", authenticate, this.addEmployee);
         this.router.get("/", authenticate, this.getEmployees);
-        this.router.get("/:id", [authenticate, validateObjectID], this.getEmployee);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getEmployeeById);
         this.router.delete("/:id", [authenticate, validateObjectID], this.deleteEmployee);
         this.router.put("/:id", [authenticate, validateObjectID], this.updateEmployee);
     }
