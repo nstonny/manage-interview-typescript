@@ -7,12 +7,16 @@ import CandidateRouter from "./routers/candidateRouter";
 import EmployeeRouter from "./routers/employeeRouter";
 import UserRouter from "./routers/userRouter";
 import { errorhandler } from "./middlewares/errorhandler";
+import * as swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "../swagger/api_doc.json";
+import * as cors from "cors";
 
 // Server class
 class Server {
     public app: express.Application;
     constructor() {
         this.app = express();
+        this.app.use(cors());
         this.database();
         this.middleware();
         this.routes();
@@ -31,14 +35,15 @@ class Server {
         const router: express.Router = express.Router();
         router.get("/", (req, res, next) => {
             res.json({
-                message: "Hello World!"
+                message: "Welcome to Manage Interview App"
             });
         });
         this.app.use("/", router);
         this.app.use("/api/v1/users", UserRouter);
-        this.app.use("/api/v1/empolyees", EmployeeRouter);
+        this.app.use("/api/v1/employees", EmployeeRouter);
         this.app.use("/api/v1/candidates", CandidateRouter);
         this.app.use("/api/v1/availabilities", AvailabilityRouter);
+        this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     }
     private middleware(): void {
         this.app.use(bodyParser.urlencoded({ extended: true }));

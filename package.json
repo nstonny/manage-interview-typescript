@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "gulp build",
     "test": "export NODE_ENV = 'test' && mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'",
+    "prestart": "gulp build",
     "start": "node ./dist/bin/www",
     "dev": "export NODE_ENV='development' && npm start"
   },
@@ -16,6 +16,7 @@
     "@types/body-parser": "0.0.33",
     "@types/chai": "^3.4.34",
     "@types/chai-http": "0.0.29",
+    "@types/cors": "^2.8.3",
     "@types/debug": "0.0.29",
     "@types/express": "^4.0.33",
     "@types/express-serve-static-core": "4.0.49",
@@ -34,9 +35,10 @@
     "ts-node": "^3.3.0",
     "typescript": "^2.7.2"
   },
-  "dependencies": {    
+  "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "debug": "^2.2.0",
     "dotenv-safe": "^5.0.1",
     "express": "^4.14.0",
@@ -46,6 +48,7 @@
     "mongodb": "^3.0.2",
     "mongoose": "^5.0.2",
     "morgan": "^1.9.0",
+    "swagger-ui-express": "^2.0.15",
     "validator": "^5.6.0"
   }
 }
