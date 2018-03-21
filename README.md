@@ -2,6 +2,9 @@
 
 A Web App that provides a list of interview time slots between candidates and their interviewers.
 
+## Features
+TODO...
+
 ## Getting Started
 
 The instructions provide steps to get this app running on your machine.
@@ -39,8 +42,7 @@ npm run dev
 When run locally, the server is set to run at http://localhost:3000 or http://127.0.0.1:3000. An appropriate message is printed on the console.
 
 ## API Documentation
-TODO...
-
+The documentation is generated using Swagger. Start the node server as described above, then head to http://localhost:3000/api-docs/ to access the documentation and test the endpoints.
 
 ## Sample data
 TODO...
