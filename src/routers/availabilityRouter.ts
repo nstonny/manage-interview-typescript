@@ -12,12 +12,7 @@ export class AvailabilityRouter {
         this.router = Router();
         this.routes();
     }
-
-    // get all availabilities
-    // get all availabilities for each employee: employee id
-    // add availability for an employee: employee id
-    // delete availability: availability id
-    // update availability: availability id
+    // should return list of availabilities from seed
     public async getAvailabilities(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await Availability.find({
@@ -28,12 +23,13 @@ export class AvailabilityRouter {
             next(err);
         }
     }
-    public async getAvailabilityByEmployeeId(req: Request, res: Response, next: NextFunction) {
+    // already get this from employee router-lists availability of an employee
+    public async getAvailabilityById(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await Availability.find({
                 _id: req.params.id,
                 _creator: req.body.user._id
-            });
+            }).populate("availabilities", "day time");
             if (!result) {
                 const err = new Error ("Data not found");
                 res.statusCode = 404;
@@ -44,7 +40,7 @@ export class AvailabilityRouter {
             next(err);
         }
     }
-    public async addAvailabilityByEmployeeId(req: Request, res: Response, next: NextFunction) {
+    public async addAvailability(req: Request, res: Response, next: NextFunction) {
         try {
             const _creator = req.body.user._id;
             const body = _.pick(req.body, ["day", "time"]);
@@ -55,7 +51,8 @@ export class AvailabilityRouter {
             next(err);
         }
     }
-    public async deleteAvailabilityByEmployeeId(req: Request, res: Response, next: NextFunction) {
+    // to be removed after seeding
+    public async deleteAvailabilityById(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await Availability.findOneAndRemove({
                 _id: req.params.id,
@@ -71,7 +68,8 @@ export class AvailabilityRouter {
             next(err);
         }
     }
-    public async updateAvailabilityByEmployeeId(req: Request, res: Response, next: NextFunction) {
+    // to be removed after seeding
+    public async updateAvailabilityById(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await Availability.findOneAndUpdate({ _id: req.params.id, _creator: req.body.user._id },
                 { $set: req.body },
@@ -88,10 +86,10 @@ export class AvailabilityRouter {
     }
     public routes() {
         this.router.get("/", authenticate, this.getAvailabilities);
-        this.router.post("/", authenticate, this.addAvailabilityByEmployeeId);
-        this.router.get("/:id", [authenticate, validateObjectID], this.getAvailabilityByEmployeeId);
-        this.router.delete("/:id", [authenticate, validateObjectID], this.deleteAvailabilityByEmployeeId);
-        this.router.put("/:id", [authenticate, validateObjectID], this.updateAvailabilityByEmployeeId);
+        this.router.post("/", authenticate, this.addAvailability);
+        this.router.get("/:id", [authenticate, validateObjectID], this.getAvailabilityById);
+        this.router.delete("/:id", [authenticate, validateObjectID], this.deleteAvailabilityById);
+        this.router.put("/:id", [authenticate, validateObjectID], this.updateAvailabilityById);
     }
 }
 // export

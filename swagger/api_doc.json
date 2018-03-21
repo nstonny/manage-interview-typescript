@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a sample server for an app that provides time-slots for  interviews between candidates and their interviewers. For this sample, you can use the api key `special-key` to test the authorization     filters.",
+    "description": "This is a sample server for an app that provides time-slots for  interviews between candidates and their interviewers.",
     "version": "1.0.0",
     "title": "Manage Interview API",
     "contact": {
@@ -24,12 +24,12 @@
       "description": "Access to employee records"
     },
     {
-      "name": "availabilities",
-      "description": "Access to employee availabilities"
-    },
-    {
       "name": "candidates",
       "description": "Access to candidate records"
+    },
+    {
+      "name": "availabilities",
+      "description": "Access to employee availabilities"
     }
   ],
   "schemes": [
@@ -335,7 +335,7 @@
             "Bearer": []
           }
         ],
-        "description": "Deletes employees",
+        "description": "Deletes employee",
         "operationId": "deleteEmployee",
         "produces": [
           "application/json"
@@ -438,6 +438,363 @@
           }
         }
       }
+    },
+    "/candidates": {
+      "get": {
+        "tags": [
+          "candidates"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Returns all candidates",
+        "operationId": "getCandidates",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidates retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "candidates"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Adds new candidate to the database",
+        "operationId": "addCandidate",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Contains candidate object to add",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Candidate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate successfully added",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/candidates/{candidateId}": {
+      "get": {
+        "tags": [
+          "candidates"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Returns a single candidate",
+        "operationId": "getCandidateById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "description": "ID of candidate to return",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "candidates"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Deletes candidate",
+        "operationId": "deleteCandidate",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "description": "ID of candidate to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted successfully",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "candidates"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Update an existing candidate data",
+        "operationId": "updateCandidate",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "description": "ID of candidate to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Candidate object that needs to be updated in the database",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Candidate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/availabilities": {
+      "get": {
+        "tags": [
+          "availabilities"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Returns all availabilities",
+        "operationId": "getAvailabilities",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Availabilities retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/availabilities/{availabilityId}": {
+      "get": {
+        "tags": [
+          "availabilities"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Returns a single availability",
+        "operationId": "getAvailabilityById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "availabilityId",
+            "in": "path",
+            "description": "ID of availability to return",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -508,7 +865,7 @@
           "type": "array",
           "description": "List availabilities of employees",
           "items": {
-            "type": "object"
+            "$ref": "#/definitions/Availability"
           }
         }
       },
@@ -519,25 +876,17 @@
     "Candidate": {
       "type": "object",
       "properties": {
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "email": {
-          "type": "string",
-          "description": "email of candidate"
-        },
         "firstName": {
           "type": "string",
-          "description": "first name of candidate"
+          "description": "first name of the candidate"
         },
         "lastName": {
           "type": "string",
-          "description": "last name of candidate"
+          "description": "last name of the candidate"
+        },
+        "email": {
+          "type": "string",
+          "description": "email of the candidate"
         },
         "positionAppliedFor": {
           "type": "string",
@@ -547,20 +896,8 @@
           "type": "array",
           "description": "List of employees to interview the candidate",
           "items": {
-            "type": "object"
+            "$ref": "#/definitions/Employee"
           }
-        },
-        "_id": {
-          "type": "string",
-          "description": "Unique id of employee record"
-        },
-        "_creator": {
-          "type": "string",
-          "description": "_id of user that created the record"
-        },
-        "_v": {
-          "type": "integer",
-          "description": "version number"
         }
       },
       "xml": {
@@ -570,31 +907,13 @@
     "Availability": {
       "type": "object",
       "properties": {
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
         "day": {
-          "type": "string"
+          "type": "string",
+          "description": "day of the month"
         },
         "time": {
-          "type": "string"
-        },
-        "_id": {
           "type": "string",
-          "description": "Unique id of employee record"
-        },
-        "_creator": {
-          "type": "string",
-          "description": "_id of user that created the record"
-        },
-        "_v": {
-          "type": "integer",
-          "description": "version number"
+          "description": "time of the month"
         }
       },
       "xml": {
@@ -611,7 +930,11 @@
           "type": "integer"
         },
         "result": {
-          "type": "object"
+          "type": "array",
+          "description": "List of resulting data",
+          "items": {
+            "type": "object"
+          }
         }
       }
     }
