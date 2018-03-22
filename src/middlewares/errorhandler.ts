@@ -10,5 +10,5 @@ export const errorhandler = (err: any, req: Request, res: Response, next: NextFu
         code,
         result
     });
-    next();
+    res.end();
 };

@@ -8,5 +8,5 @@ export const successhandler = (result: any, req: Request, res: Response, next: N
         code,
         result
     });
-    next();
+    res.end();
 };
